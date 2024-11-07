@@ -166,11 +166,8 @@ public class AboutActivity extends BaseActivity implements MenuProvider {
             if(dns_mode != null)
                 deviceInfo += "\n" + "PrivateDnsMode: " + dns_mode;
 
-            String mitm_version = MitmAddon.getInstalledVersionName(this);
-            if (!mitm_version.isEmpty()) {
-                deviceInfo += "\n" + "MitmAddonVersion: " + mitm_version;
-                deviceInfo += "\n" + "MitmBatteryOptimized: " + (MitmAddon.isDozeEnabled(this) ? "true" : "false");
-            }
+            // Mitm doze
+            deviceInfo += "\n" + "MitmBatteryOptimized: " + ((MitmAddon.isInstalled(this) && MitmAddon.isDozeEnabled(this)) ? "true" : "false");
 
             LayoutInflater inflater = LayoutInflater.from(this);
             View view = inflater.inflate(R.layout.scrollable_dialog, null);

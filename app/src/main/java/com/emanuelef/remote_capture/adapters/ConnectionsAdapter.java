@@ -164,7 +164,7 @@ public class ConnectionsAdapter extends RecyclerView.Adapter<ConnectionsAdapter.
             blockedInd.setVisibility(conn.is_blocked ? View.VISIBLE : View.GONE);
             redirectedInd.setVisibility((conn.isPortMappingApplied() && !conn.is_blocked) ? View.VISIBLE : View.GONE);
 
-            if(CaptureService.isDecryptingTLS()) {
+            if(CaptureService.isDecryptingTLS() || PCAPdroid.getInstance().isDecryptingPcap()) {
                 decryptionInd.setVisibility(View.VISIBLE);
                 Utils.setDecryptionIcon(decryptionInd, conn);
             } else
@@ -470,7 +470,6 @@ public class ConnectionsAdapter extends RecyclerView.Adapter<ConnectionsAdapter.
                 builder.append(conn.dst_port);                              builder.append(",");
                 builder.append(conn.uid);                                   builder.append(",");
                 builder.append((app != null) ? app.getName() : "");         builder.append(",");
-                builder.append((app != null) ? app.getPackageName() : "");  builder.append(",");
                 builder.append(conn.l7proto);                               builder.append(",");
                 builder.append(conn.getStatusLabel(mContext));              builder.append(",");
                 builder.append((conn.info != null) ? conn.info : "");       builder.append(",");

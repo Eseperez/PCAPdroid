@@ -136,8 +136,6 @@ static int matches_uid_filter(const int *filter, int uid) {
   while (*filter != -1) {
     if (*filter == uid)
       return 1;
-
-    filter++;
   }
 
   // no match

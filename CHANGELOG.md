@@ -2,19 +2,6 @@
 
 Releases available at https://github.com/emanuele-f/PCAPdroid/releases
 
-## [1.7.4] - 2024-10-16
-- Fix root capture start in some non-magisk su binaries (credits: jackyzy823)
-- The mitm addon now uses mitmproxy 11
-- Include the package name in the CSV output (credits: Chris Vanstone)
-
-## [1.7.3] - 2024-09-07
-- Allow setting the app language from the system (for Android 13+)
-- Mitm addon v1.2: allow public files write, fix enabled addons reset, fix addons reload
-- You can now use a compatible mitm addon with the same major version
-- Detect always-on VPN enabled after capture start
-- Catch possible crash in getUserBadgedIcon in Android 8
-- Disable unfinished languages: fr, ja, ko, nb, pl, pt
-
 ## [1.7.2] - 2024-04-20
 - Fix broken PCAP file loading feature
 - Minor enhancements

@@ -22,7 +22,6 @@ package com.emanuelef.remote_capture;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.app.LocaleManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.UiModeManager;
@@ -59,7 +58,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.LocaleList;
 import android.os.Looper;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -104,6 +102,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -343,19 +342,6 @@ public class Utils {
     public static Configuration getLocalizedConfig(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Configuration config = context.getResources().getConfiguration();
-
-        // On Android 33+, app language is configured from the system settings
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (Prefs.useEnglishLanguage(prefs)) {
-                Log.i(TAG, "Migrate from in-app language picker to system picker");
-                prefs.edit().remove(Prefs.PREF_APP_LANGUAGE).apply();
-
-                context.getSystemService(LocaleManager.class)
-                        .setApplicationLocales(new LocaleList(Locale.forLanguageTag("en-US")));
-            }
-
-            return config;
-        }
 
         if(!Prefs.useEnglishLanguage(prefs))
             return config;
@@ -1803,27 +1789,20 @@ public class Utils {
         }
     }
 
-    public static int getMajorVersion(String ver) {
-        int start_idx = 0;
+    public static boolean isPcapng(Context ctx, Uri uri) {
+        try (InputStream in_stream = ctx.getContentResolver().openInputStream(uri)) {
+            try (DataInputStream data_in = new DataInputStream(in_stream)) {
+                int block_type = data_in.readInt();
+                data_in.skipBytes(4);
+                int magic = data_in.readInt();
 
-        // optionally starts with "v"
-        if (ver.startsWith("v"))
-            start_idx = 1;
-
-        int end_idx = ver.indexOf('.');
-        if (end_idx < 0)
-            return -1;
-
-        try {
-            return Integer.parseInt(ver.substring(start_idx, end_idx));
-        } catch (NumberFormatException ignored) {
-            return -1;
+                return ((block_type == 0x0A0D0D0A) &&
+                        ((magic == 0x1a2b3c4d) || (magic == 0x4d3c2b1a)));
+            }
+        } catch (IOException e) {
+            Log.w(TAG, "Reading " + uri + " failed: " + e);
         }
-    }
 
-    // true if the two provided versions are semantically compatible (i.e. same major)
-    public static boolean isSemanticVersionCompatible(String a, String b) {
-        int va = getMajorVersion(a);
-        return (va >= 0) && (va == getMajorVersion(b));
+        return false;
     }
 }
